@@ -47,7 +47,7 @@ class gcn(nn.Module):
 
 
 class gwnet(nn.Module):
-    def __init__(self, device, num_nodes, dropout=0.3, supports=None, gcn_bool=True, addaptadj=True, aptinit=None, in_dim=2,out_dim=12,residual_channels=32,dilation_channels=32,skip_channels=256,end_channels=512,kernel_size=2,blocks=4,layers=2):
+    def __init__(self, device, num_nodes, dropout=0.3, supports=None, gcn_bool=True, addaptadj=True, aptinit=None, in_dim=1,out_dim=12,residual_channels=32,dilation_channels=32,skip_channels=256,end_channels=512,kernel_size=2,blocks=4,layers=2):
         super(gwnet, self).__init__()
         self.dropout = dropout
         self.blocks = blocks
@@ -102,17 +102,17 @@ class gwnet(nn.Module):
                                                    out_channels=dilation_channels,
                                                    kernel_size=(1,kernel_size),dilation=new_dilation))
 
-                self.gate_convs.append(nn.Conv1d(in_channels=residual_channels,
+                self.gate_convs.append(nn.Conv2d(in_channels=residual_channels,
                                                  out_channels=dilation_channels,
                                                  kernel_size=(1, kernel_size), dilation=new_dilation))
 
                 # 1x1 convolution for residual connection
-                self.residual_convs.append(nn.Conv1d(in_channels=dilation_channels,
+                self.residual_convs.append(nn.Conv2d(in_channels=dilation_channels,
                                                      out_channels=residual_channels,
                                                      kernel_size=(1, 1)))
 
                 # 1x1 convolution for skip connection
-                self.skip_convs.append(nn.Conv1d(in_channels=dilation_channels,
+                self.skip_convs.append(nn.Conv2d(in_channels=dilation_channels,
                                                  out_channels=skip_channels,
                                                  kernel_size=(1, 1)))
                 self.bn.append(nn.BatchNorm2d(residual_channels))
@@ -204,8 +204,3 @@ class gwnet(nn.Module):
         x = F.relu(self.end_conv_1(x))
         x = self.end_conv_2(x)
         return x
-
-
-
-
-
